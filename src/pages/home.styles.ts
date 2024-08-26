@@ -7,9 +7,11 @@ const HomeContainer = styled.div`
 `;
 
 const Logo = styled.img`
-    margin-top: 0;
-    height: 45px;
+    display: none;
     @media (min-width: 768px) {
+        display: block; 
+        margin-top: 0;
+        height: 45px;
         align-self: flex-start;
     }
 `;

@@ -18,11 +18,24 @@ const ModalContent = styled.div`
     padding: 20px;
     border-radius: 8px;
     max-width: 500px;
-    width: 100%;
+    width: 80%;
 `;
 
 const Title = styled.h2``;
 const Paragraph = styled.p``;
+
+const Strong = styled.strong`
+    margin-right: 5px
+`;
+
+const Circle = styled.span<{ $isActive: boolean }>`
+    display: inline-flex;
+    margin: 0 10px;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background-color: ${({$isActive}) => $isActive ? 'green' : 'red'};
+`;
 const CloseButton = styled.button`
     display: block;
     max-width: 250px;
@@ -36,10 +49,13 @@ const CloseButton = styled.button`
     cursor: pointer;
 `;
 
+
 export {
   ModalContent,
   Overlay,
   Title,
   Paragraph,
+  Strong,
+  Circle,
   CloseButton
-}
+};

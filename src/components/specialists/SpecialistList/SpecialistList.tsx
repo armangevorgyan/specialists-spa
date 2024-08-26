@@ -12,6 +12,8 @@ import {
 import { selectFilters } from '../../../store/filter/filtersSlice.ts';
 import { Grid, ListContainer, ShowMoreButton } from './specialistList.styles.ts';
 import { Filters } from '../../../types/types.ts';
+import EmptyList from '../EmptyList/EmptyList.tsx';
+import { Spinner, SpinnerOverlay } from '../../shared/SpinnerOverlay/SpinnerOverlay.ts';
 
 
 const SpecialistList: React.FC = () => {
@@ -26,7 +28,6 @@ const SpecialistList: React.FC = () => {
   const limit = 12;
 
   useEffect(() => {
-    // In Development Mode: useEffect might run twice due to React Strict Mode.
     dispatch(searchSpecialists({
       filters,
       limit: 12,
@@ -57,11 +58,14 @@ const SpecialistList: React.FC = () => {
   return (
     <>
       <ListContainer>
-        <Grid ref={specialistListRef}>
+        {items.length ? <Grid ref={specialistListRef}>
+          <SpinnerOverlay $isLoading={loading === 'pending'}>
+            <Spinner />
+          </SpinnerOverlay>
           {items.map((specialist) => (
             <SpecialistCard key={specialist.userId} specialist={specialist}/>
           ))}
-        </Grid>
+        </Grid> : <EmptyList/>}
       </ListContainer>
 
       {items.length < totalCount && (

@@ -9,6 +9,7 @@ export interface Specialist {
   level: number;
   rating: number;
   hasVideo: boolean;
+  isCertified: boolean;
   defaultSubjectName: string;
   subjectsCount: number;
   isFavorite: boolean;
@@ -23,16 +24,16 @@ export interface Subject {
 }
 
 export interface Filters {
-  level?: number;
-  sex?: number;
-  subjectId?: number;
-  profSpeciality?: number;
+  level?: string;
+  sex?: string;
+  subjectId?: string;
+  profSpeciality?: string;
   isCertified?: boolean;
-  ratingFrom?: number;
-  ratingTo?: number;
-  ageFrom?: number;
-  ageTo?: number;
-  filterType?: number;
+  ratingFrom?: string;
+  ratingTo?: string;
+  ageFrom?: string;
+  ageTo?: string;
+  filterType?: string;
 }
 
 interface Option<T, M> {
@@ -41,8 +42,8 @@ interface Option<T, M> {
 }
 
 export interface FilterOptionsInterface {
-  sex: Option<number | string, string>[];
-  age: Option<number, number>[];
-  profSpeciality: Option<number | string, string>[],
+  sex: Option<string, string>[];
+  age: Option<string, string>[];
+  profSpeciality: Option<string, string>[],
   ratingOptions: Option<string, string>[]
 }

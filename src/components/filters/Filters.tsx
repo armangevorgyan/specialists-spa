@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch } from '../../store/hooks.ts';
 import { useSelector } from 'react-redux';
-import { getSubjects, selectFilters, selectSubjects, setFilter } from '../../store/filter/filtersSlice.ts';
-import { Button, FilterContainer, FilterWrapper, Label, Select, Option, SelectContainer } from './filter.styles.ts';
+import { getSubjects, selectFilters, selectSubjectLoading, selectSubjects, setFilter } from '../../store/filter/filtersSlice.ts';
+import { AgeContainer, Button, FilterContainer, FilterWrapper, Label, SelectContainer } from './filter.styles.ts';
 import { Subject } from '../../types/types.ts';
 import { useSearchParams } from 'react-router-dom';
 import { FilterOptions } from './FilterOptions.ts';
+import CustomSelect from '../shared/CustomSelect/CustomSelect.tsx';
 
 
 const Filters: React.FC = () => {
   const dispatch = useAppDispatch();
   const filters = useSelector(selectFilters);
   const subjects = useSelector(selectSubjects);
+  const loading = useSelector(selectSubjectLoading);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -25,7 +27,6 @@ const Filters: React.FC = () => {
   }, [dispatch, searchParams]);
 
   useEffect(() => {
-    // In Development Mode: useEffect might run twice due to React Strict Mode.
     const params: { [key: string]: string } = {};
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== '') {
@@ -34,11 +35,14 @@ const Filters: React.FC = () => {
     });
 
     setSearchParams(params);
-    dispatch(getSubjects());
 
-  }, [dispatch, filters, setSearchParams]);
+    if (!loading && !subjects.length) {
+      dispatch(getSubjects());
+    }
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  }, [dispatch, filters, loading, setSearchParams, subjects]);
+
+  const handleFilterChange = (e: { target: { name: string; value: string } }) => {
     const {
       name,
       value
@@ -46,8 +50,8 @@ const Filters: React.FC = () => {
     dispatch(setFilter({[name]: value}));
   };
 
-  const handleRatingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const [from, to] = e.target.value.split('-').map(Number);
+  const handleRatingChange = (e: { target: { name: string; value: string } }) => {
+    const [from, to] = e.target.value.split('-').map(String);
     dispatch(setFilter({
       ratingFrom: from,
       ratingTo: to
@@ -60,67 +64,78 @@ const Filters: React.FC = () => {
         <FilterWrapper>
           <Label> Я ищу психолога </Label>
           <SelectContainer>
-            <Select name='sex' value={filters.sex} onChange={handleFilterChange}>
-              {FilterOptions.sex.map((sex) => <Option className='filterOption' key={sex.value} value={sex.value}>{sex.label}</Option>)}
-            </Select>
+            <CustomSelect name='sex' placeholder={'Пол'}
+                          value={filters.sex}
+                          onChange={handleFilterChange}
+                          options={FilterOptions.sex}
+            />
           </SelectContainer>
         </FilterWrapper>
         <FilterWrapper>
-          <Label>В возрасте </Label> <
-          SelectContainer>
-          <Label fontSize={16} fontWeight={600} $mb='0'> От: </Label>
-          <Select name='ageFrom' value={filters.ageFrom} onChange={handleFilterChange} $mr='55px'>
-            <Option className='filterOption' value={''}>От</Option>)
-            {FilterOptions.age.map((age) => <Option className='filterOption' key={age.value} value={age.value}>{age.label}</Option>)}
-          </Select>
-          <Label fontSize={16} fontWeight={600} $mb='0'> До: </Label>
-          <Select name='ageTo' value={filters.ageTo} onChange={handleFilterChange}>
-            <Option className='filterOption' value={''}>До</Option>)
-            {FilterOptions.age.map((age) => <Option className='filterOption' key={age.value} value={age.value}>{age.label}</Option>)}
-          </Select>
-        </SelectContainer>
+          <Label>В возрасте </Label>
+          <SelectContainer>
+            <AgeContainer>
+              <Label fontSize={16} fontWeight={600} $mb='0'> От: </Label>
+              <CustomSelect name='ageFrom' placeholder={'От'} mr={10}
+                            value={filters.ageFrom}
+                            onChange={handleFilterChange}
+                            options={FilterOptions.age}/>
+            </AgeContainer>
+
+            <AgeContainer>
+              <Label fontSize={16} fontWeight={600} $mb='0'> До: </Label>
+              <CustomSelect name='ageTo' placeholder={'До'}
+                            value={filters.ageTo}
+                            onChange={handleFilterChange}
+                            options={FilterOptions.age}/>
+            </AgeContainer>
+
+          </SelectContainer>
         </FilterWrapper>
         <FilterWrapper>
           <Label> Тема </Label>
           <SelectContainer>
-            <Select name='subjectId' value={filters.subjectId} onChange={handleFilterChange}>
-              <Option value={''}>Все варианты</Option>
-              {subjects?.map((subject: Subject) => (
-                <Option key={subject.id} value={subject.id}>{subject.name}</Option>
-              ))}
-              {/* Add subject Options from API */}
-            </Select>
+            <CustomSelect name='subjectId' placeholder={'Тема'}
+                          value={filters.subjectId}
+                          onChange={handleFilterChange}
+                          options={subjects.length ? [{
+                            value: '',
+                            label: 'Все варианты'
+                          }, ...subjects.map((subject: Subject) => ({
+                            value: subject.id.toString(),
+                            label: subject.name
+                          }))] : []}
+            />
           </SelectContainer>
         </FilterWrapper>
       </FilterContainer>
-      <FilterContainer>
+      <FilterContainer className='border-bottom'>
         <FilterWrapper>
           <Label> Квалификация </Label>
           <SelectContainer>
-            <Select name='profSpeciality' value={filters.profSpeciality} onChange={handleFilterChange}>
-              {FilterOptions.profSpeciality.map((prof) => <Option key={prof.value} value={prof.value}>{prof.label}</Option>)}
-            </Select>
+            <CustomSelect name='profSpeciality' placeholder={'Квалификация'}
+                          value={filters.profSpeciality}
+                          onChange={handleFilterChange}
+                          options={FilterOptions.profSpeciality}/>
           </SelectContainer>
         </FilterWrapper>
         <FilterWrapper>
           <Label> Рейтинг </Label>
           <SelectContainer>
-            <Select name='rating' value={`${filters.ratingFrom}-${filters.ratingTo}`} onChange={handleRatingChange}>
-              {FilterOptions.ratingOptions.map((rating) => <Option key={rating.value} value={rating.value}>{rating.label}</Option>)}
-            </Select>
+            <CustomSelect name='rating' placeholder={'Рейтинг'}
+                          value={`${filters.ratingFrom}-${filters.ratingTo}`}
+                          onChange={handleRatingChange}
+                          options={FilterOptions.ratingOptions}/>
           </SelectContainer>
         </FilterWrapper>
-
         <FilterWrapper>
-          <Label> </Label>
+          <Label className='search-label'> </Label>
           <SelectContainer>
             <Button>Показать анкеты</Button>
           </SelectContainer>
         </FilterWrapper>
       </FilterContainer>
-
-    </>
-  );
+    </>);
 };
 
 export default Filters;

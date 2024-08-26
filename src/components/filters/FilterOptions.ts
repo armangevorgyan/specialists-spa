@@ -10,32 +10,32 @@ const FilterOptions: FilterOptionsInterface = {
       label: 'Любого пола'
     },
     {
-      value: 1,
+      value: '1',
       label: 'Мужчина'
     },
     {
-      value: 2,
+      value: '2',
       label: 'Женщина'
     }
   ],
   age: Array.from({length: ageTo - ageFrom + 1}, (_, i) => ({
-    value: ageFrom + i,
-    label: ageFrom + i
+    value: (ageFrom + i).toString(),
+    label: (ageFrom + i).toString()
   })),
   profSpeciality: [
     {
       value: '',
       label: 'Все варианты'
     }, {
-      value: 1,
+      value: '1',
       label: 'Консультант'
     },
     {
-      value: 2,
+      value: '2',
       label: 'Сексолог'
     },
     {
-      value: 3,
+      value: '3',
       label: 'Коуч'
     }
   ],

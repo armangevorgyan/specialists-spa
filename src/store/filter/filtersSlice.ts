@@ -6,24 +6,13 @@ import { fetchSubjects } from '../../services/subjectsAPI.ts';
 interface FiltersSliceProps {
   filters: Filters;
   subjects: Subject[],
-  loading: 'pending' | 'success' | 'failed';
+  loading: boolean;
 }
 
 const initialState: FiltersSliceProps = {
-  filters: {
-    // level: 0,
-    // sex: 1,
-    // subjectId: 8,
-    // profSpeciality: 0,
-    // isCertified: false,
-    // ratingFrom: 0,
-    // ratingTo: 100,
-    // ageFrom: 18,
-    // ageTo: 99,
-    // filterType: 0
-  },
+  filters: {},
   subjects: [],
-  loading: 'pending'
+  loading: false
 };
 export const filtersSlice = createAppSlice({
   name: 'filters',
@@ -35,14 +24,14 @@ export const filtersSlice = createAppSlice({
       },
       {
         pending: (state) => {
-          state.loading = 'pending';
+          state.loading = true;
         },
         fulfilled: (state, action) => {
-          state.loading = 'success';
+          state.loading = false;
           state.subjects = action.payload;
         },
         rejected: (state) => {
-          state.loading = 'failed';
+          state.loading = false;
         }
       }),
     setFilter: create.reducer((state, action: PayloadAction<Partial<Filters>>) => {
@@ -57,8 +46,9 @@ export const filtersSlice = createAppSlice({
   }),
 
   selectors: {
-    selectFilters: (filters) => filters.filters,
-    selectSubjects: (filters) => filters.subjects
+    selectFilters: (state) => state.filters,
+    selectSubjects: (state) => state.subjects,
+    selectSubjectLoading: (state) => state.loading
   }
 });
 
@@ -70,5 +60,6 @@ export const {
 
 export const {
   selectFilters,
-  selectSubjects
+  selectSubjects,
+  selectSubjectLoading
 } = filtersSlice.selectors;
