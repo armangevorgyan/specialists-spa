@@ -8,9 +8,7 @@ export const fetchSpecialists = async (filters: Filters, limit: number, offset: 
     limit,
     offset
   });
-  console.log(params);
   const response: { data: { items: Specialist[], totalCount: number } } = await getRequest(`search/specialists${params}`);
-  console.log(response);
   return response.data;
 };
 

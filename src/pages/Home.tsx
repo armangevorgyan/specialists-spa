@@ -1,18 +1,14 @@
 import React from 'react';
 import Filters from '../components/filters/Filters.tsx';
-import SpecialistList from '../components/specialists/SpecialistList.tsx';
+import SpecialistList from '../components/specialists/SpecialistList/SpecialistList.tsx';
+import logo from '/logo.svg';
+import { HomeContainer, Logo } from './home.styles.ts';
 
-import styled from 'styled-components';
 
-const HomeContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-`;
 const Home: React.FC = () => {
   return (
     <HomeContainer>
-      <h1>Specialists</h1>
+      <Logo src={logo} alt='logo'/>
       <Filters/>
       <SpecialistList/>
     </HomeContainer>

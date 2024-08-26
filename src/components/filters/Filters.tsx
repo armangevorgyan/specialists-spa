@@ -1,80 +1,42 @@
+import React, { useEffect } from 'react';
 import { useAppDispatch } from '../../store/hooks.ts';
 import { useSelector } from 'react-redux';
-import { selectFilters, setFilter } from '../../store/filter/filtersSlice.ts';
-import styled from 'styled-components';
+import { getSubjects, selectFilters, selectSubjects, setFilter } from '../../store/filter/filtersSlice.ts';
+import { Button, FilterContainer, FilterWrapper, Label, Select, Option, SelectContainer } from './filter.styles.ts';
+import { Subject } from '../../types/types.ts';
+import { useSearchParams } from 'react-router-dom';
+import { FilterOptions } from './FilterOptions.ts';
 
-const FilterContainer = styled.div`
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    flex-direction: column;
-    @media (min-width: 768px) {
-        flex-direction: row;
-        margin-bottom: 20px;
-
-    }
-`;
-
-const FilterWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 10px 0;
-    
-    @media (min-width: 768px) {
-        width: 33%;
-        max-width: 312px;
-    }
-`;
-const SelectContainer = styled.div`
-    display: flex;
-    align-items: center;
-    width: 100%;
-`;
-
-const Label = styled.div<{ fontWeight?: number, fontSize?: number, mb?: string }>`
-    display: flex;
-    align-items: center;
-    color: #000;
-    margin-right: 12px;
-    height: 27px;
-    margin-bottom: ${({mb}) => mb || 12}px;
-    font-weight: ${({fontWeight}) => fontWeight || 700};
-    font-size: ${({fontSize}) => fontSize || 18}px;
-`;
-
-
-const Select = styled.select<{ mr?: string, ml?: string }>`
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    height: 52px;
-    margin-right: ${({mr}) => mr || 0};
-    margin-left: ${({ml}) => ml || 0};
-`;
-
-const Button = styled.button`
-    background-color: #FF006B;
-    color: white;
-    border: none;
-    font-size: 20px;
-    line-height: 20px;
-    font-weight: 700;
-    border-radius: 2px;
-    padding: 16px 68px;
-    cursor: pointer;
-    height: 52px;
-    width: 100%;
-
-    @media (min-width: 768px) {
-        max-width: 312px;
-    }
-`;
 
 const Filters: React.FC = () => {
   const dispatch = useAppDispatch();
   const filters = useSelector(selectFilters);
+  const subjects = useSelector(selectSubjects);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const urlFilters: { [key: string]: string } = {};
+    for (const [key, value] of searchParams.entries()) {
+      urlFilters[key] = value;
+    }
+    if (Object.keys(urlFilters).length > 0) {
+      dispatch(setFilter(urlFilters));
+    }
+  }, [dispatch, searchParams]);
+
+  useEffect(() => {
+    // In Development Mode: useEffect might run twice due to React Strict Mode.
+    const params: { [key: string]: string } = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== '') {
+        params[key] = value.toString();
+      }
+    });
+
+    setSearchParams(params);
+    dispatch(getSubjects());
+
+  }, [dispatch, filters, setSearchParams]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const {
@@ -84,6 +46,14 @@ const Filters: React.FC = () => {
     dispatch(setFilter({[name]: value}));
   };
 
+  const handleRatingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const [from, to] = e.target.value.split('-').map(Number);
+    dispatch(setFilter({
+      ratingFrom: from,
+      ratingTo: to
+    }));
+  };
+
   return (
     <>
       <FilterContainer>
@@ -91,24 +61,22 @@ const Filters: React.FC = () => {
           <Label> Я ищу психолога </Label>
           <SelectContainer>
             <Select name='sex' value={filters.sex} onChange={handleFilterChange}>
-              <option value='0'>Любого пола</option>
-              <option value='1'>Мужчина</option>
-              <option value='2'>Женщина</option>
+              {FilterOptions.sex.map((sex) => <Option className='filterOption' key={sex.value} value={sex.value}>{sex.label}</Option>)}
             </Select>
           </SelectContainer>
         </FilterWrapper>
         <FilterWrapper>
           <Label>В возрасте </Label> <
           SelectContainer>
-          <Label fontSize={16} fontWeight={600} mb='0'> От: </Label>
-          <Select name='ageFrom' value={filters.ageFrom} onChange={handleFilterChange} mr='55px'>
-            <option value='18'>18</option>
-            {/* Add more age options */}
+          <Label fontSize={16} fontWeight={600} $mb='0'> От: </Label>
+          <Select name='ageFrom' value={filters.ageFrom} onChange={handleFilterChange} $mr='55px'>
+            <Option className='filterOption' value={''}>От</Option>)
+            {FilterOptions.age.map((age) => <Option className='filterOption' key={age.value} value={age.value}>{age.label}</Option>)}
           </Select>
-          <Label fontSize={16} fontWeight={600} mb='0'> До: </Label>
+          <Label fontSize={16} fontWeight={600} $mb='0'> До: </Label>
           <Select name='ageTo' value={filters.ageTo} onChange={handleFilterChange}>
-            <option value='74'> 74</option>
-            {/* Add more age options */}
+            <Option className='filterOption' value={''}>До</Option>)
+            {FilterOptions.age.map((age) => <Option className='filterOption' key={age.value} value={age.value}>{age.label}</Option>)}
           </Select>
         </SelectContainer>
         </FilterWrapper>
@@ -116,8 +84,11 @@ const Filters: React.FC = () => {
           <Label> Тема </Label>
           <SelectContainer>
             <Select name='subjectId' value={filters.subjectId} onChange={handleFilterChange}>
-              <option value='0'>Любая</option>
-              {/* Add subject options from API */}
+              <Option value={''}>Все варианты</Option>
+              {subjects?.map((subject: Subject) => (
+                <Option key={subject.id} value={subject.id}>{subject.name}</Option>
+              ))}
+              {/* Add subject Options from API */}
             </Select>
           </SelectContainer>
         </FilterWrapper>
@@ -127,19 +98,15 @@ const Filters: React.FC = () => {
           <Label> Квалификация </Label>
           <SelectContainer>
             <Select name='profSpeciality' value={filters.profSpeciality} onChange={handleFilterChange}>
-              <option value='0'>Все варианты</option>
-              <option value='1'>Консультант</option>
-              <option value='2'>Сексолог</option>
-              <option value='3'>Коуч</option>
+              {FilterOptions.profSpeciality.map((prof) => <Option key={prof.value} value={prof.value}>{prof.label}</Option>)}
             </Select>
           </SelectContainer>
         </FilterWrapper>
         <FilterWrapper>
           <Label> Рейтинг </Label>
           <SelectContainer>
-            <Select name='rating' value={`${filters.ratingFrom}-${filters.ratingTo}`} onChange={handleFilterChange}>
-              <option value='0-5'>Не важен</option>
-              {/* Add more rating options */}
+            <Select name='rating' value={`${filters.ratingFrom}-${filters.ratingTo}`} onChange={handleRatingChange}>
+              {FilterOptions.ratingOptions.map((rating) => <Option key={rating.value} value={rating.value}>{rating.label}</Option>)}
             </Select>
           </SelectContainer>
         </FilterWrapper>

@@ -7,7 +7,7 @@ export const Layout = styled.div`
     padding: 20px;
     display: flex;
     justify-content: center;
-    
+    overflow-x: hidden;
 
     @media (max-width: 768px) {
         padding: 10px;

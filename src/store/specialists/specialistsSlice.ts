@@ -34,7 +34,11 @@ export const specialistsSlice = createAppSlice({
         },
         fulfilled: (state, action) => {
           state.loading = 'succeeded';
-          state.items = action.payload.items;
+          if (action.meta.arg.offset === 0) {
+            state.items = action.payload.items;
+          } else {
+            state.items = [...state.items, ...action.payload.items];
+          }
           state.totalCount = action.payload.totalCount;
         },
         rejected: (state, action) => {

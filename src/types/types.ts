@@ -23,14 +23,26 @@ export interface Subject {
 }
 
 export interface Filters {
-  level: number;
-  sex: number;
-  subjectId: number;
-  profSpeciality: number;
-  isCertified: boolean;
-  ratingFrom: number;
-  ratingTo: number;
-  ageFrom: number;
-  ageTo: number;
-  filterType: number;
+  level?: number;
+  sex?: number;
+  subjectId?: number;
+  profSpeciality?: number;
+  isCertified?: boolean;
+  ratingFrom?: number;
+  ratingTo?: number;
+  ageFrom?: number;
+  ageTo?: number;
+  filterType?: number;
+}
+
+interface Option<T, M> {
+  value: T;
+  label: M;
+}
+
+export interface FilterOptionsInterface {
+  sex: Option<number | string, string>[];
+  age: Option<number, number>[];
+  profSpeciality: Option<number | string, string>[],
+  ratingOptions: Option<string, string>[]
 }
