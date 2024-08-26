@@ -28,7 +28,6 @@ export interface Filters {
   sex?: string;
   subjectId?: string;
   profSpeciality?: string;
-  isCertified?: boolean;
   ratingFrom?: string;
   ratingTo?: string;
   ageFrom?: string;

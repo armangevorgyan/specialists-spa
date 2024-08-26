@@ -14,6 +14,7 @@ import { Grid, ListContainer, ShowMoreButton } from './specialistList.styles.ts'
 import { Filters } from '../../../types/types.ts';
 import EmptyList from '../EmptyList/EmptyList.tsx';
 import { Spinner, SpinnerOverlay } from '../../shared/SpinnerOverlay/SpinnerOverlay.ts';
+import { useSearchParams } from 'react-router-dom';
 
 
 const SpecialistList: React.FC = () => {
@@ -26,10 +27,16 @@ const SpecialistList: React.FC = () => {
   const filters: Filters = useAppSelector(selectFilters);
   const [offset, setOffset] = useState(0);
   const limit = 12;
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    const urlFilters: Filters = {};
+    for (const [key, value] of searchParams.entries()) {
+      urlFilters[key as keyof Filters] = value;
+    }
+
     dispatch(searchSpecialists({
-      filters,
+      filters: urlFilters,
       limit: 12,
       offset: 0
     }));
@@ -41,7 +48,7 @@ const SpecialistList: React.FC = () => {
     });
 
 
-  }, [dispatch, filters]);
+  }, [dispatch, searchParams]);
 
   const handleShowMore = () => {
     const newOffset = offset + limit;
@@ -60,7 +67,7 @@ const SpecialistList: React.FC = () => {
       <ListContainer>
         {items.length ? <Grid ref={specialistListRef}>
           <SpinnerOverlay $isLoading={loading === 'pending'}>
-            <Spinner />
+            <Spinner/>
           </SpinnerOverlay>
           {items.map((specialist) => (
             <SpecialistCard key={specialist.userId} specialist={specialist}/>

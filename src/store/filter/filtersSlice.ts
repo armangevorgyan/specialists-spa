@@ -14,6 +14,7 @@ const initialState: FiltersSliceProps = {
   subjects: [],
   loading: false
 };
+
 export const filtersSlice = createAppSlice({
   name: 'filters',
   initialState,

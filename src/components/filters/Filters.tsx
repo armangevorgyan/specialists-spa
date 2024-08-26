@@ -1,7 +1,13 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch } from '../../store/hooks.ts';
 import { useSelector } from 'react-redux';
-import { getSubjects, selectFilters, selectSubjectLoading, selectSubjects, setFilter } from '../../store/filter/filtersSlice.ts';
+import {
+  getSubjects,
+  selectFilters,
+  selectSubjectLoading,
+  selectSubjects,
+  setFilter
+} from '../../store/filter/filtersSlice.ts';
 import { AgeContainer, Button, FilterContainer, FilterWrapper, Label, SelectContainer } from './filter.styles.ts';
 import { Subject } from '../../types/types.ts';
 import { useSearchParams } from 'react-router-dom';
@@ -24,6 +30,7 @@ const Filters: React.FC = () => {
     if (Object.keys(urlFilters).length > 0) {
       dispatch(setFilter(urlFilters));
     }
+
   }, [dispatch, searchParams]);
 
   useEffect(() => {
@@ -39,7 +46,6 @@ const Filters: React.FC = () => {
     if (!loading && !subjects.length) {
       dispatch(getSubjects());
     }
-
   }, [dispatch, filters, loading, setSearchParams, subjects]);
 
   const handleFilterChange = (e: { target: { name: string; value: string } }) => {
@@ -47,7 +53,18 @@ const Filters: React.FC = () => {
       name,
       value
     } = e.target;
-    dispatch(setFilter({[name]: value}));
+    const params: { [key: string]: string } = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== '') {
+        params[key] = value.toString();
+      }
+    });
+    if (value !== '') {
+      params[name] = value;
+    }
+    setSearchParams(params);
+
+    // dispatch(setFilter({[name]: value}));
   };
 
   const handleRatingChange = (e: { target: { name: string; value: string } }) => {
